@@ -19,5 +19,6 @@ namespace FindPet.Core
         public string Location { get; set; }
         [Required]
         public string Username { get; set; }
+        public List<Comment>? Comments { get; set; }
     }
 }

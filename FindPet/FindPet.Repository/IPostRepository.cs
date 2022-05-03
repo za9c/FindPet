@@ -9,5 +9,8 @@ namespace FindPet.Repository
         public void DeletePost(Post post);
         public Post GetById(int id);
         public IEnumerable<Post> GetAllPosts();
+        public IEnumerable<Post> GetPostsByStatus(string status);
+        public IEnumerable<Post> GetPostsByUser(string username);
+        public void AddComment(Comment comment);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FindPet.Core;
 using FindPet.Core.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace FindPet.Repository
 {
@@ -58,7 +59,22 @@ namespace FindPet.Repository
 
         public Post GetById(int id)
         {
-            return context.Posts.Find(id);
+            return context.Posts.Include(c => c.Comments).FirstOrDefault(i => i.Id == id);
+        }
+        public IEnumerable<Post> GetPostsByStatus(string status)
+        {
+            return context.Posts.Where(x => x.Status == status).ToList();
+        }
+
+        public IEnumerable<Post> GetPostsByUser(string username)
+        {
+            return context.Posts.Where(x => x.Username == username).ToList();
+        }
+
+        public void AddComment(Comment comment)
+        {
+            context.Add(comment);
+            context.SaveChanges();
         }
     }
 }

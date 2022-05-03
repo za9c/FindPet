@@ -1,5 +1,7 @@
 ﻿using FindPet.Core;
 using FindPet.Repository;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FindPet.WebApp.Controllers
@@ -8,11 +10,13 @@ namespace FindPet.WebApp.Controllers
     {
         private readonly IPostRepository postRepo;
         private readonly IWebHostEnvironment environment;
+        private readonly SignInManager<IdentityUser> signInManager;
 
-        public PostsController(PostRepository postR, IWebHostEnvironment env)
+        public PostsController(PostRepository postR, IWebHostEnvironment env, SignInManager<IdentityUser> signIn)
         {
             postRepo = postR;
             environment = env;
+            signInManager = signIn;
         }
 
         public IActionResult Index()
@@ -22,12 +26,14 @@ namespace FindPet.WebApp.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreatePost([Bind("Status,Description,Location,PhotoFile,Username")] Post model)
         {
             if (ModelState.IsValid)
@@ -49,7 +55,7 @@ namespace FindPet.WebApp.Controllers
                 var extention = "." + splitName.Last();
 
                 var fileName = Guid.NewGuid() + extention;
-                var physicalPath = environment.ContentRootPath + "/Photos/" + fileName.ToString();
+                var physicalPath = environment.WebRootPath + "/Photos/" + fileName.ToString();
 
                 using (var stream = new FileStream(physicalPath, FileMode.Create))
                 {
@@ -60,6 +66,7 @@ namespace FindPet.WebApp.Controllers
             return "";
         }
 
+        [Authorize]
         public IActionResult Edit(int id)
         {
             if (id == null)
@@ -92,6 +99,7 @@ namespace FindPet.WebApp.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> EditPost(int id, [Bind("Status,Description,Location,PhotoFile,Username")] Post model)
         {
             if (ModelState.IsValid)
@@ -115,6 +123,7 @@ namespace FindPet.WebApp.Controllers
             return View(model);
         }
 
+        [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             if (id == null)
@@ -130,6 +139,7 @@ namespace FindPet.WebApp.Controllers
             return View(post);
         }
 
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var post = postRepo.GetById(id);
@@ -140,12 +150,66 @@ namespace FindPet.WebApp.Controllers
 
         public void DeletePhoto(string photoName)
         {
-            var imagePath = environment.ContentRootPath + "/Photos/" + photoName;
+            var imagePath = environment.WebRootPath + "/Photos/" + photoName;
 
             if (System.IO.File.Exists(imagePath))
             {
                 System.IO.File.Delete(imagePath);
             }
+        }
+
+        [Authorize]
+        public async Task<IActionResult> MyPosts()
+        {
+            var username = signInManager.Context.User.Identity.Name;
+            var posts = postRepo.GetPostsByUser(username);
+            return View(posts);
+        }
+
+        public async Task<IActionResult> FoundPet()
+        {
+            var found = postRepo.GetPostsByStatus("Знайдено");
+            return View(found);
+        }
+
+        public async Task<IActionResult> LostPet()
+        {
+            var lost = postRepo.GetPostsByStatus("Загублено");
+            return View(lost);
+        }
+
+        public IActionResult Details(int id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var post = postRepo.GetById(id);
+            if (post == null)
+            {
+                return NotFound();
+            }
+            ViewBag.PhotoName = post.Photo;
+            return View(post);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public IActionResult Comment([Bind("Id,PostId,Username,Text")] Comment model)
+        {
+            var post = postRepo.GetById(model.PostId);
+            post.Comments = post.Comments ?? new List<Comment>();
+
+            if (model.Text == null)
+                return RedirectToAction("Details", new { id = model.PostId });
+
+            model.CreationDate = DateTime.UtcNow;
+            if (ModelState.IsValid)
+            {
+                postRepo.AddComment(model);
+            }
+            return RedirectToAction("Details", new { id = model.PostId });
         }
     }
 }

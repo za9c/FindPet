@@ -14,5 +14,7 @@ namespace FindPet.Core
         public int PostId { get; set; }
         [Required]
         public string Username { get; set; }
+        [Required]
+        public DateTime CreationDate { get; set; }
     }
 }
