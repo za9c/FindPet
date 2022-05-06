@@ -5,10 +5,10 @@
 @inject UserManager<IdentityUser> UserManager
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Search";
 }
 
-<h3>Всі Оголошення</h3>
+<h3>Знайдені Оголошення</h3>
 
 <p style = "display: flex; justify-content:flex-end">
     <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-circle"></i>&nbspДодати оголошення</a>
@@ -44,14 +44,12 @@
             </td>
             
             <td>
-                <td>
                 @if (SignInManager.IsSignedIn(User) && item.Username == User.Identity.Name.ToString())
                 {                    
                     <a asp-action="Edit" asp-route-id="@item.Id" data-toggle="tooltip" data-placement="top" title="Edit" style="color:green"><i class="bi bi-pen"></i></a>
                     <a asp-action="Delete" asp-route-id="@item.Id" data-toggle="tooltip" data-placement="top" title="Delete" style="color:red"><i class="bi bi-trash"></i></a> 
                 }                
                 <a asp-action="Details" asp-route-id="@item.Id" data-toggle="tooltip" data-placement="top" title="Details" style="color:blue"><i class="bi bi-chat-left-text"></i></a>                  
-            </td>                
             </td>           
         </tr>
         }

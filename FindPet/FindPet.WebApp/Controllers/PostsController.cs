@@ -9,14 +9,17 @@ namespace FindPet.WebApp.Controllers
     public class PostsController : Controller
     {
         private readonly IPostRepository postRepo;
+        private readonly ICommentRepository commentRepo;
         private readonly IWebHostEnvironment environment;
         private readonly SignInManager<IdentityUser> signInManager;
 
-        public PostsController(PostRepository postR, IWebHostEnvironment env, SignInManager<IdentityUser> signIn)
+        public PostsController(PostRepository postR, IWebHostEnvironment env, SignInManager<IdentityUser> signIn,
+            CommentRepository commentR)
         {
             postRepo = postR;
             environment = env;
             signInManager = signIn;
+            commentRepo = commentR;
         }
 
         public IActionResult Index()
@@ -144,6 +147,14 @@ namespace FindPet.WebApp.Controllers
         {
             var post = postRepo.GetById(id);
             DeletePhoto(post.Photo);
+            if (post.Comments != null)
+            {
+                var comments = commentRepo.GetAllComments();
+                foreach (var c in comments)
+                {
+                    commentRepo.DeleteComment(c);
+                }
+            }
             postRepo.DeletePost(post);
             return RedirectToAction("Index");
         }
@@ -207,9 +218,15 @@ namespace FindPet.WebApp.Controllers
             model.CreationDate = DateTime.UtcNow;
             if (ModelState.IsValid)
             {
-                postRepo.AddComment(model);
+                commentRepo.AddComment(model);
             }
             return RedirectToAction("Details", new { id = model.PostId });
+        }
+
+        public IActionResult Search(string searchPhrase)
+        {
+            var posts = postRepo.Search(searchPhrase);
+            return View("SearchResult", posts);
         }
     }
 }

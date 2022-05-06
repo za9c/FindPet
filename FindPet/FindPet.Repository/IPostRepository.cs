@@ -11,6 +11,6 @@ namespace FindPet.Repository
         public IEnumerable<Post> GetAllPosts();
         public IEnumerable<Post> GetPostsByStatus(string status);
         public IEnumerable<Post> GetPostsByUser(string username);
-        public void AddComment(Comment comment);
+        public IEnumerable<Post> Search(string searchPhrase);
     }
 }

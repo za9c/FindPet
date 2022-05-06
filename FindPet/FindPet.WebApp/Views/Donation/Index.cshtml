@@ -1,0 +1,35 @@
+﻿@model IEnumerable<FindPet.Core.Donation>
+
+@{
+    ViewData["Title"] = "Donation";
+}
+
+<div style = "display: flex; justify-content:space-between">
+    <a class="btn btn-primary" asp-action="HelpPet" ><i class="bi bi-plus-circle"></i>&nbspДопомогти мопсам</a>
+    <p>Разом ми зібрали: <b>@ViewBag.Sum</b> співчуттів</p>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Меценати</th>
+            <th>Сума</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null)
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Username)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Quontity)
+                    </td>       
+                </tr>
+            }
+        }
+    </tbody>
+</table>

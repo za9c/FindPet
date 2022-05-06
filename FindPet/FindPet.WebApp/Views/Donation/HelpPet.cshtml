@@ -1,0 +1,17 @@
+﻿@model FindPet.Core.Donation
+
+@{
+    ViewData["Title"] = "Help";
+}
+
+<form asp-controller="Donation" asp-action="Donate" method="post">
+    <div>
+        <input asp-for="Username" type="hidden" autofocus class="form-control" value="@User.Identity.Name.ToString()">
+    </div>
+    <div style="margin-bottom: 1%; margin-top: 2%; display: flex; justify-content:center;">
+        <input placeholder="Сума допомоги" asp-for="Quontity" type="number" min="1">
+    </div>
+    <div style="display: flex; justify-content:center; width: auto">
+        <button class="btn btn-primary" type="submit">Допомогти</button>
+    </div>
+</form>

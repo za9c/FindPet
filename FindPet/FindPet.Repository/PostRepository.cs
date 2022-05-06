@@ -71,10 +71,9 @@ namespace FindPet.Repository
             return context.Posts.Where(x => x.Username == username).ToList();
         }
 
-        public void AddComment(Comment comment)
+        public IEnumerable<Post> Search(string searchPhrase)
         {
-            context.Add(comment);
-            context.SaveChanges();
+            return context.Posts.Where(x => x.Description.Contains(searchPhrase) || x.Location.Contains(searchPhrase)).ToList();
         }
     }
 }

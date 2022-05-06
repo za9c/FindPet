@@ -16,6 +16,8 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<PostRepository>();
+builder.Services.AddScoped<CommentRepository>();
+builder.Services.AddScoped<DonationRepository>();
 
 var app = builder.Build();
 
